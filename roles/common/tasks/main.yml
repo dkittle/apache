@@ -1,0 +1,19 @@
+---
+- include: apt.yml
+- include: sudo.yml
+- include: users.yml
+- include: ntp.yml
+#- include: awscli.yml
+
+- name: Install required common packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - unzip
+    - curl
+    - php5-curl
+    - vim
+    - less
+    - telnet
+
+
+

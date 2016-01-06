@@ -1,0 +1,102 @@
+---
+- include_vars: mysql_vars.yml
+
+- name: create mysql root pass
+  command: /usr/bin/openssl rand -base64 16
+  register: mysql_root_passwd
+
+- name: update mysql root passwd
+  mysql_user: name=root host={{ item }} password={{ mysql_root_passwd.stdout }} 
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: copy root user my.cnf file with passwd credentials
+  template: src=dotmy.cnf.j2 dest=/root/.my.cnf owner=root group=root mode=0600
+
+- name: copy our default my.cnf file
+  template: src=my.cnf.j2 dest=/etc/mysql/my.cnf owner=root group=root mode=0644
+
+- name: delete anonymous mysql user
+  mysql_user: name="" state=absent
+
+- name: remove mysql test database
+  mysql_db: name=test state=absent
+
+- name: create kittle blog database
+  mysql_db: name={{ mysql.blog_kittle }} state=present
+
+- name: create kittle blog user
+  mysql_user: name={{ mysql.blog_kittle }} host={{ item }} password={{ mysql.blog_kittle_passwd }} priv={{ mysql.blog_kittle }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: create portrait blog database
+  mysql_db: name={{ mysql.blog_portrait }} state=present
+
+- name: create portrait blog user
+  mysql_user: name={{ mysql.blog_portrait }} host={{ item }} password={{ mysql.blog_portrait_passwd }} priv={{ mysql.blog_portrait }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: create family blog database
+  mysql_db: name={{ mysql.blog_family }} state=present
+
+- name: create family blog user
+  mysql_user: name={{ mysql.blog_family }} host={{ item }} password={{ mysql.blog_family_passwd }} priv={{ mysql.blog_family }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: create landscape/urban blog database
+  mysql_db: name={{ mysql.blog_vista }} state=present
+
+- name: create landscape/urban blog user
+  mysql_user: name={{ mysql.blog_vista }} host={{ item }} password={{ mysql.blog_vista_passwd }} priv={{ mysql.blog_vista }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: create wedding blog database
+  mysql_db: name={{ mysql.blog_wedding }} state=present
+
+- name: create wedding blog user
+  mysql_user: name={{ mysql.blog_wedding }} host={{ item }} password={{ mysql.blog_wedding_passwd }} priv={{ mysql.blog_wedding }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: create code blog database
+  mysql_db: name={{ mysql.blog_code }} state=present
+
+- name: create kittle blog user
+  mysql_user: name={{ mysql.blog_code }} host={{ item }} password={{ mysql.blog_code_passwd }} priv={{ mysql.blog_code }}.*:ALL state=present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - '%'
+    - ::1
+    - localhost
+
+- name: bounce mysql
+  service: name=mysql state=restarted

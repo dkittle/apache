@@ -1,0 +1,10 @@
+---
+# file: roles/common/tasks/users.yml
+
+- group: name=admin state=present
+
+- name: add user Don
+  user: name=don comment="Don Kittle" groups=admin,staff,root append=yes shell=/bin/bash
+
+- name: add authorized key Don
+  authorized_key: user=don key="ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAy7SuRYhAM4CSy0XsVCPCBLFWqYPU2o6C97jlmgicLMQ3igdcoTUU6As1UsE7J05nILlZlv1V+912I+o68XJxRkqxWJSMQ4cwHIuI19d+iWir30nGmPMBxtFQZhaMT/EwbEqJ8c9PIkdTrGslurX4K9fjVV14sM1CNQnfq6Vo1jCZ09mRZf4O3d9fCfKP/brgkWK+xlu7oxK+IiEBoA87T+Hnizt4RVtNDyzYPThdrOsAp7+NqSa7IzGYh0ec2nO6Yj4kS3sd6BVZ5u2ezww10hVoIlP1HIP8++6BuTLoAWouT6wv4ul0UXQ5UclPlAkrHfMqJd2kOsYI7ERYmncrJw=="

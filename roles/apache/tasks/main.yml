@@ -1,0 +1,74 @@
+---
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: install apache2
+  apt: name={{ item }} state=latest
+  with_items:
+    - apache2
+    - libapache2-mod-php5
+    - php5-mcrypt
+
+- name: enabled mod_rewrite
+  apache2_module: name=rewrite state=present
+  notify:
+    - restart apache2
+
+- name: create virtual host file for kittle.ca
+  template: src=kittle.conf dest=/etc/apache2/sites-available/kittle.conf
+
+- name: create virtual host file for donkittle.com
+  template: src=donkittle.conf dest=/etc/apache2/sites-available/donkittle.conf
+
+- name: create virtual host file for donkittleportraits.com
+  template: src=portraits.conf dest=/etc/apache2/sites-available/portraits.conf
+
+- name: create virtual host file for donkittlefamilies.com
+  template: src=families.conf dest=/etc/apache2/sites-available/families.conf
+
+- name: create virtual host file for donkittlevistas.com
+  template: src=vistas.conf dest=/etc/apache2/sites-available/vistas.conf
+
+- name: create virtual host file for donkittleweddings.com
+  template: src=weddings.conf dest=/etc/apache2/sites-available/weddings.conf
+
+- name: a2ensite kittle
+  command: a2ensite kittle
+  args:
+    creates: /etc/apache2/sites-enabled/kittle.conf
+
+- name: a2ensite donkittle
+  command: a2ensite donkittle
+  args:
+    creates: /etc/apache2/sites-enabled/donkittle.conf
+
+- name: a2ensite portraits
+  command: a2ensite portraits
+  args:
+    creates: /etc/apache2/sites-enabled/portraits.conf
+
+- name: a2ensite families
+  command: a2ensite families
+  args:
+    creates: /etc/apache2/sites-enabled/families.conf
+
+- name: a2ensite vistas
+  command: a2ensite vistas
+  args:
+    creates: /etc/apache2/sites-enabled/vistas.conf
+
+- name: a2ensite weddings
+  command: a2ensite weddings
+  args:
+    creates: /etc/apache2/sites-enabled/weddings.conf
+
+- name: Increase size of php upload
+  replace:
+    dest=/etc/php5/apache2/php.ini
+    regexp='upload_max_filesize = 2M'
+    replace='upload_max_filesize = 64M'
+    backup=yes
+
+- command: /bin/true
+  notify:
+  - restart apache2
